@@ -5,7 +5,6 @@
 
 This repository is SA25001039 Liu FeiYang's implementation of Assignment_01 of DIP. 
 
-<img src="pics/teaser.png" alt="alt text" width="800">
 
 ## Requirements
 
