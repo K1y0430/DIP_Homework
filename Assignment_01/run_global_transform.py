@@ -20,7 +20,38 @@ def apply_transform(image, scale, rotation, translation_x, translation_y, flip_h
 
     ### FILL: Apply Composition Transform 
     # Note: for scale and rotation, implement them around the center of the image （围绕图像中心进行放缩和旋转）
+    h, w = image.shape[:2]
+    center = (w / 2, h / 2)
 
+    M_sr = cv2.getRotationMatrix2D(center, rotation, scale)
+    M_sr_3x3 = to_3x3(M_sr)
+
+    M_t = np.array([
+        [1, 0, translation_x],
+        [0, 1, translation_y],
+        [0, 0, 1]
+    ], dtype=np.float32)
+
+    if flip_horizontal:
+        M_f = np.array([
+            [-1, 0, w - 1],
+            [0, 1, 0],
+            [0, 0, 1]
+        ], dtype=np.float32)
+    else:
+        M_f = np.eye(3, dtype=np.float32)
+
+    M = M_t @ M_f @ M_sr_3x3
+
+    transformed_image = cv2.warpAffine(
+        image,
+        M[:2, :],
+        (w, h),
+        flags=cv2.INTER_LINEAR,
+        borderMode=cv2.BORDER_CONSTANT,
+        borderValue=(255, 255, 255)
+    )
+    
     return transformed_image
 
 # Gradio Interface
