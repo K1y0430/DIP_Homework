@@ -102,6 +102,10 @@ python run_point_transform.py
 ## Acknowledgement
 
 >📋 Thanks for the algorithms proposed by [Image Deformation Using Moving Least Squares](https://people.engr.tamu.edu/schaefer/research/mls.pdf).
->  OpenCV Documentation: Geometric Image Transformations.
->  Gradio Documentation: Interactive Web Interfaces for Image Processing Applications.
->  OpenCV Documentation: `warpAffine` and `remap`.
+
+This work was completed with reference to the following materials:
+
+- Schaefer, S., McPhail, T., and Warren, J., “Image Deformation Using Moving Least Squares,” *ACM Transactions on Graphics*, vol. 25, no. 3, pp. 533–540, 2006. [Online]. Available: https://people.engr.tamu.edu/schaefer/research/mls.pdf
+- OpenCV Documentation, “Geometric Image Transformations.” [Online]. Available: https://docs.opencv.org/
+- OpenCV Documentation, “warpAffine” and “remap.” [Online]. Available: https://docs.opencv.org/
+- Gradio Documentation, “Interactive Web Interfaces for Image Processing Applications.” [Online]. Available: https://www.gradio.app/docs/
