@@ -68,6 +68,29 @@ To run point guided transformation, run:
 ```point
 python run_point_transform.py
 ```
+##  Input and Output
+
+###  Basic Image Geometric Transformation
+
+**Input**
+- an uploaded input image
+- scale factor
+- rotation angle
+- translation along x-axis
+- translation along y-axis
+- whether to apply horizontal flipping
+
+**Output**
+- the transformed image after composing all selected geometric operations
+
+###  Point-Guided Image Deformation
+
+**Input**
+- an uploaded input image
+- multiple pairs of source and target control points
+
+**Output**
+- the warped image after local deformation guided by the selected control points
 
 ## Results 
 ### Basic Transformation
@@ -79,3 +102,6 @@ python run_point_transform.py
 ## Acknowledgement
 
 >📋 Thanks for the algorithms proposed by [Image Deformation Using Moving Least Squares](https://people.engr.tamu.edu/schaefer/research/mls.pdf).
+>  OpenCV Documentation: Geometric Image Transformations.
+>  Gradio Documentation: Interactive Web Interfaces for Image Processing Applications.
+>  OpenCV Documentation: `warpAffine` and `remap`.
