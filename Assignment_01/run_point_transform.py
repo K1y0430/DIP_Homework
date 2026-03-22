@@ -49,7 +49,41 @@ def point_guided_deformation(image, source_pts, target_pts, alpha=1.0, eps=1e-8)
 
     warped_image = np.array(image)
     ### FILL: Implement MLS or RBF based image warping
+    if image is None:
+        return warped_image
 
+    if len(source_pts) == 0 or len(target_pts) == 0:
+        return warped_image
+
+    n = min(len(source_pts), len(target_pts))
+    source_pts = source_pts[:n].astype(np.float32)
+    target_pts = target_pts[:n].astype(np.float32)
+
+    h, w = image.shape[:2]
+    yy, xx = np.meshgrid(np.arange(h), np.arange(w), indexing='ij')
+    grid = np.stack([xx, yy], axis=-1).astype(np.float32)
+
+    disp = source_pts - target_pts
+    diff = grid[:, :, None, :] - target_pts[None, None, :, :]
+    dist2 = np.sum(diff ** 2, axis=-1) + eps
+    weights = 1.0 / (dist2 ** alpha)
+    weights_sum = np.sum(weights, axis=-1, keepdims=True)
+    weights = weights / weights_sum
+
+    field = np.sum(weights[:, :, :, None] * disp[None, None, :, :], axis=2)
+    map_xy = grid + field
+
+    map_x = np.clip(map_xy[:, :, 0], 0, w - 1).astype(np.float32)
+    map_y = np.clip(map_xy[:, :, 1], 0, h - 1).astype(np.float32)
+
+    warped_image = cv2.remap(
+        image,
+        map_x,
+        map_y,
+        interpolation=cv2.INTER_LINEAR,
+        borderMode=cv2.BORDER_REFLECT101
+    )
+    
     return warped_image
 
 def run_warping():
