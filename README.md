@@ -17,6 +17,7 @@ Each assignment is placed in a separate subfolder, with source code, running ins
 ## Assignment List
 
 - [Assignment 01 - Image Warping](./Assignment_01)
+- [Assignment 02 - Image Warping](./Assignment_02)
 
 More assignments will be added in this repository later.
 
