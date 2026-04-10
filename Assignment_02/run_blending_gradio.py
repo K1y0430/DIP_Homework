@@ -150,7 +150,7 @@ def cal_laplacian_loss(foreground_img, foreground_mask, blended_img, background_
         device=foreground_img.device
     ).view(1, 1, 3, 3)
 
-    lap_kernel = lap_kernel.repeat(c, 1, 1, 1)  # 每个通道一个同样的kernel
+    lap_kernel = lap_kernel.repeat(c, 1, 1, 1) 
 
     fg_lap = F.conv2d(foreground_img, lap_kernel, padding=1, groups=c)
     blend_lap = F.conv2d(blended_img, lap_kernel, padding=1, groups=c)
