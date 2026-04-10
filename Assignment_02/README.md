@@ -75,11 +75,6 @@ conda activate pytorch
 pip install torch torchvision numpy pillow gradio opencv-python
 ```
 
-If `cv2` is missing when running `train.py`, install OpenCV with:
-
-```bash
-pip install opencv-python
-```
 
 ### Windows Notes
 
