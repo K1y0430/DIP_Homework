@@ -55,7 +55,6 @@ Each subfolder contains:
 - `source.png`: the foreground image used for region selection
 - `target.png`: the background image used for blending
 
-The folder `figures` stores the images used in this report.
 
 ---
 
