@@ -7,7 +7,7 @@ This repository contains **Liu Feiyang (SA25001039)**'s implementation of **Assi
 The goal of this assignment is to understand and implement both traditional and deep learning-based DIP methods with PyTorch. In this assignment, I completed two representative tasks:
 
 1. **Poisson Image Editing**
-2. **Pix2Pix / Fully Convolutional Image-to-Image Translation**
+2. **Pix2Pix**
 
 The first task focuses on gradient-domain image blending, while the second task uses a fully convolutional network to learn an image-to-image mapping on the Facades dataset.
 
