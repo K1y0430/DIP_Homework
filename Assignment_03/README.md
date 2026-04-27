@@ -98,20 +98,17 @@ I parameterized the optimization variables as follows:
 - **Camera translations**: optimized directly as 3D vectors.
 - **3D points**: optimized directly as learnable coordinates.
 
-For a 3D point \(P = (X, Y, Z)\), the camera-space coordinates are computed by:
+For a 3D point `P = (X, Y, Z)`, the camera-space coordinates are computed by:
 
-\[
-[X_c, Y_c, Z_c]^T = R P + T
-\]
+`[Xc, Yc, Zc]^T = R P + T`
 
 According to the coordinate convention given in the assignment, the projection equations are:
 
-\[
-u = -f \frac{X_c}{Z_c} + c_x, \qquad
-v = f \frac{Y_c}{Z_c} + c_y
-\]
+`u = -f * Xc / Zc + cx`
 
-where \(c_x = \frac{W}{2}\) and \(c_y = \frac{H}{2}\).
+`v =  f * Yc / Zc + cy`
+
+where `cx = W / 2` and `cy = H / 2`.
 
 The loss function is mainly the **reprojection error** between the predicted 2D points and the observed 2D points. Visibility masks are used so that only visible points contribute to the loss. To stabilize optimization, mild regularization terms are also added.
 
@@ -157,21 +154,21 @@ After optimization, the script saves:
 
 #### 6.1 Optimization Loss
 
-<img src="figures/task1_loss_curve.png" alt="Task 1 Loss Curve" width="700">
+<img src="figures/loss_curve.png" alt="Task 1 Loss Curve" width="700">
 
 The optimization loss decreases rapidly at the beginning and then gradually converges, which shows that the bundle adjustment process is effective and numerically stable.
 
 #### 6.2 Reprojection Visualization
 
-<img src="figures/task1_reproj_1.png" alt="Task 1 Reprojection 1" width="700">
-<img src="figures/task1_reproj_2.png" alt="Task 1 Reprojection 2" width="700">
-<img src="figures/task1_reproj_3.png" alt="Task 1 Reprojection 3" width="700">
+<img src="figures/reprojection/view_000_reproj.png" alt="Task 1 Reprojection 1" width="700">
+<img src="figures/reprojection/view_025_reproj.png" alt="Task 1 Reprojection 2" width="700">
+<img src="figures/reprojection/view_049_reproj.png" alt="Task 1 Reprojection 3" width="700">
 
 In the reprojection figures, the **observed points** and the **predicted points** largely overlap with each other, indicating that the optimized 3D structure and camera parameters can explain the 2D observations reasonably well.
 
 #### 6.3 Reconstructed 3D Point Cloud
 
-<img src="figures/task1_point_cloud.png" alt="Task 1 Point Cloud" width="700">
+<img src="figures/point_cloud_top.png" alt="Task 1 Point Cloud" width="700">
 
 The reconstructed point cloud captures the overall bust structure, including the head, neck, and upper body region. Although the global 3D shape is not perfectly ideal, the result is consistent with the reprojection alignment and demonstrates that the implemented bundle adjustment is able to recover a meaningful 3D structure.
 
@@ -181,8 +178,8 @@ You may summarize the final results in a small table like this:
 
 | Metric | Value |
 |--------|-------|
-| Final focal length | **[fill in your value]** |
-| Final reprojection RMSE | **[fill in your value]** |
+| Final focal length | **12789.183594** |
+| Final reprojection RMSE | **9.5451 pixels** |
 
 ---
 
