@@ -29,14 +29,29 @@ Assignment_03/
 │  ├─ reconstructed.obj
 │  └─ camera_params.npz
 └─ figures/
-   ├─ task1_loss_curve.png
-   ├─ task1_point_cloud.png
-   ├─ task1_reproj_1.png
-   ├─ task1_reproj_2.png
-   ├─ task1_reproj_3.png
+   ├─ loss_curve.png
+   ├─ point_cloud_view1.png
+   ├─ point_cloud_view2.png
+   ├─ point_cloud_front.png
+   ├─ point_cloud_side.png
+   ├─ point_cloud_top.png
+   ├─ reprojection/
+   │  ├─ view_000_reproj.png
+   │  ├─ view_012_reproj.png
+   │  ├─ view_025_reproj.png
+   │  ├─ view_037_reproj.png
+   │  └─ view_049_reproj.png
    ├─ task2_sparse.png
    └─ task2_dense.png
 ```
+
+- `outputs/reconstructed.obj`: the reconstructed colored point cloud exported from Task 1.
+- `outputs/camera_params.npz`: the optimized focal length and camera extrinsic parameters.
+- `figures/loss_curve.png`: the optimization loss curve for bundle adjustment.
+- `figures/point_cloud_*.png`: reconstructed 3D point cloud visualized from different viewpoints.
+- `figures/reprojection/*.png`: reprojection comparison images, where observed 2D points and predicted 2D points are overlaid on the rendered images.
+- `figures/task2_sparse.png`: sparse reconstruction result from COLMAP.
+- `figures/task2_dense.png`: dense reconstruction result from COLMAP.
 
 ---
 
