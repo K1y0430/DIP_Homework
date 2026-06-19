@@ -19,7 +19,7 @@ Each assignment is placed in a separate subfolder, with source code, running ins
 - [Assignment 01 - Image Warping](./Assignment_01)
 - [Assignment 02 - DIPwithPyTorch](./Assignment_02)
 - [Assignment 03 - BundleAdjustment](./Assignment_03)
-- - [Assignment 04 - 3DGS](./Assignment_04)
+- [Assignment 04 - 3DGS](./Assignment_04)
 
 More assignments will be added in this repository later.
 
