@@ -25,7 +25,6 @@ Assignment_04/
 ├─ render_3dgs_mv.py
 ├─ mvs_with_colmap.py
 ├─ debug_mvs_by_projecting_pts.py
-├─ data/
 └─ figures/
    ├─ epoch_0000.png
    ├─ epoch_0100.png
