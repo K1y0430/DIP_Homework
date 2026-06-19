@@ -1,122 +1,312 @@
-# Assignment 4 Report: Implement Simplified 3D Gaussian Splatting
+# Assignment 4 - Implement Simplified 3D Gaussian Splatting
 
-## 1. Introduction
+## Digital Image Processing Course Assignment
 
-In this assignment, we implemented a simplified version of 3D Gaussian Splatting (3DGS) in pure PyTorch and completed the pipeline from sparse reconstruction to Gaussian-based differentiable rendering. The whole workflow can be divided into three parts: recovering camera parameters and sparse 3D points with COLMAP, implementing the simplified Gaussian rendering pipeline, and comparing our implementation with the official 3DGS framework.
+This repository contains **Liu Feiyang (SA25001039)**'s implementation of **Assignment 4** for the **Digital Image Processing (DIP)** course.
 
-The `chair` scene was used in the experiments. This report presents the implementation details, training results, and qualitative comparison with the official implementation.
+In this assignment, I completed three tasks:
 
----
+1. **Structure-from-Motion with COLMAP**
+2. **Simplified 3D Gaussian Splatting**
+3. **Comparison with the Official 3DGS Implementation**
 
-## 2. Task 1: Structure-from-Motion with COLMAP
-
-In Task 1, COLMAP was used to recover the camera intrinsics, camera poses, and sparse 3D points from the input multi-view images. The recovered sparse point cloud was then used as the initialization of the Gaussian primitives in the following stage.
-
-After reconstruction, the recovered 3D points were reprojected back to the image planes for verification. The reprojection results showed that the recovered points were generally aligned with the chair structure in the input images, which indicates that the recovered geometry and camera parameters were sufficiently accurate for the subsequent 3DGS training stage.
-
-Although the sparse reconstruction itself is not dense enough for direct photorealistic rendering, it provides a reasonable geometric prior for Gaussian initialization.
+The first task focuses on recovering camera parameters and sparse 3D points from multi-view images using COLMAP. The second task implements a simplified version of 3D Gaussian Splatting in pure PyTorch. The third task compares my implementation with the official 3DGS framework.
 
 ---
 
-## 3. Task 2: Simplified 3D Gaussian Splatting
+## Repository Structure
 
-### 3.1 Implementation
+```text
+Assignment_04/
+├─ README.md
+├─ gaussian_model.py
+├─ gaussian_renderer.py
+├─ train.py
+├─ render_3dgs_mv.py
+├─ mvs_with_colmap.py
+├─ debug_mvs_by_projecting_pts.py
+├─ data/
+└─ figures/
+   ├─ epoch_0000.png
+   ├─ epoch_0100.png
+   ├─ epoch_0199.png
+   ├─ render_mv.mp4
+   ├─ 00041.png
+   ├─ 00062.png
+   └─ 00099.png
+```
 
-The simplified 3DGS pipeline was implemented in pure PyTorch. Compared with the official implementation, this version does not include the highly optimized rasterization pipeline or adaptive densification, but it still covers the core ideas of Gaussian-based scene representation and differentiable rendering.
+* `gaussian_model.py`: Gaussian parameter initialization and covariance construction.
+* `gaussian_renderer.py`: Gaussian projection, evaluation, and alpha blending rendering.
+* `train.py`: training script for the simplified 3DGS model.
+* `render_3dgs_mv.py`: multi-view rendering script after training.
+* `mvs_with_colmap.py`: COLMAP pipeline script for sparse reconstruction.
+* `debug_mvs_by_projecting_pts.py`: reprojection visualization for verifying COLMAP results.
+* `figures/epoch_0000.png`, `epoch_0100.png`, `epoch_0199.png`: representative training results of the simplified implementation.
+* `figures/render_mv.mp4`: final multi-view rendering video of the simplified implementation.
+* `figures/00041.png`, `00062.png`, `00099.png`: representative rendering results from the official 3DGS implementation.
 
-The implementation mainly includes the following components:
+**Note:** The original `data/` folder is not uploaded to this repository because it contains a large number of files and takes substantial storage space. Only the key result figures and the video used in the report are included.
 
-1. **Gaussian initialization from sparse COLMAP points**
-   Each sparse 3D point is converted into a Gaussian primitive with learnable position, color, opacity, rotation, and scale.
+---
 
-2. **3D covariance construction**
-   The 3D covariance matrix of each Gaussian is constructed from the learnable rotation and scaling parameters.
+## Environment Setup
 
-3. **Projection from 3D to 2D**
-   The Gaussian means and covariance matrices are projected from world space to image space through the camera extrinsics and intrinsics.
+It is recommended to use a **conda environment**.
+
+### Create environment
+
+```bash
+conda create -n dip python=3.10
+conda activate dip
+```
+
+### Install Python dependencies
+
+```bash
+pip install numpy matplotlib opencv-python torch torchvision natsort iopath
+```
+
+If additional packages are needed, they can be installed manually.
+
+For the official 3DGS implementation, the environment can be configured according to the official repository requirements.
+
+---
+
+## Task 1: Structure-from-Motion with COLMAP
+
+### 1. Task Description
+
+In this task, I used **COLMAP** to recover the camera intrinsics, camera poses, and sparse 3D points from the multi-view rendered images in `data/chair/images/`.
+
+The recovered sparse points are used as the initialization of the Gaussian representation in the following simplified 3DGS stage.
+
+---
+
+### 2. Input and Output
+
+**Input**
+
+* Multi-view rendered images in `data/chair/images/`
+
+**Output**
+
+* Sparse reconstruction model in `data/chair/sparse/0/`
+* Text-format sparse model in `data/chair/sparse/0_text/`
+* Reprojection verification results generated by the debugging script
+
+---
+
+### 3. Method
+
+The COLMAP pipeline includes the following main steps:
+
+1. **Feature Extraction**
+2. **Feature Matching**
+3. **Sparse Reconstruction**
+4. **Model Conversion**
+5. **Reprojection Verification**
+
+After sparse reconstruction, the recovered 3D points were projected back to the image plane for qualitative verification. This step helps check whether the recovered camera parameters and sparse geometry are consistent with the original observations.
+
+---
+
+### 4. Running
+
+To run Task 1:
+
+```bash
+python mvs_with_colmap.py --data_dir data/chair
+python debug_mvs_by_projecting_pts.py --data_dir data/chair
+```
+
+---
+
+### 5. Results
+
+The COLMAP pipeline successfully recovered the camera parameters and a sparse 3D structure of the chair scene. Although the sparse point cloud is not dense enough for direct rendering, it provides a reliable geometric prior for the Gaussian initialization in Task 2.
+
+The reprojection verification also shows that the recovered sparse points are generally consistent with the image content, which indicates that the recovered geometry and camera poses are reasonable.
+
+---
+
+### 6. Discussion
+
+Task 1 provides the geometric foundation for the whole assignment. The sparse reconstruction result is not intended for high-quality rendering by itself, but it is sufficient to initialize the Gaussian positions and colors in the simplified 3DGS model.
+
+---
+
+## Task 2: Simplified 3D Gaussian Splatting
+
+### 1. Task Description
+
+In this task, I implemented a simplified version of **3D Gaussian Splatting (3DGS)** in pure PyTorch. Starting from the sparse COLMAP points, each point is represented as a learnable Gaussian primitive, and the whole scene is rendered differentiably through Gaussian projection and alpha blending.
+
+Compared with the official 3DGS framework, this simplified implementation does not include more advanced engineering components such as optimized tile-based rasterization or adaptive densification. However, it still demonstrates the core idea of Gaussian-based scene representation and rendering.
+
+---
+
+### 2. Input and Output
+
+**Input**
+
+* Sparse COLMAP reconstruction from `data/chair/sparse/0/`
+* Multi-view images in `data/chair/images/`
+
+**Output**
+
+* Learned Gaussian parameters
+* Training checkpoints
+* Debug images during training
+* Final multi-view rendering video
+
+---
+
+### 3. Method
+
+The simplified 3DGS implementation mainly contains the following components:
+
+1. **Gaussian initialization**
+   The sparse COLMAP points are converted into Gaussian primitives with learnable position, color, opacity, rotation, and scale.
+
+2. **Covariance construction**
+   The 3D covariance matrix is constructed from Gaussian scale and rotation parameters.
+
+3. **Projection to image plane**
+   The 3D Gaussian means and covariances are projected into 2D image space through the camera intrinsics and extrinsics.
 
 4. **2D Gaussian evaluation**
-   The projected Gaussians contribute pixel values according to the 2D Gaussian density.
+   Pixel values are computed from the projected Gaussians using the Gaussian density function.
 
 5. **Alpha blending rendering**
-   After sorting Gaussians by depth, the final image is rendered by alpha compositing.
+   The final rendered image is obtained by compositing Gaussians sorted by depth.
 
-The model is optimized by minimizing the image reconstruction loss between rendered images and the corresponding ground-truth views.
-
----
-
-### 3.2 Training Process
-
-To observe the optimization process, debug images were saved during training. The following figures show the rendering quality at different training stages.
-
-#### Early stage
-
-![Early training result](figures/epoch_0000.png)
-
-At the beginning of training, the rendered result is still very rough. The main chair structure is only vaguely visible, and the image is blurry with limited geometric consistency. This is expected because the Gaussian parameters have not yet adapted to the appearance of the scene.
-
-#### Middle stage
-
-![Middle training result](figures/epoch_0100.png)
-
-After further optimization, the chair structure becomes much more recognizable. Major color regions and object boundaries begin to emerge, and the rendered image becomes more stable. However, the edges are still not sufficiently sharp, and some fine details remain unclear.
-
-#### Late stage
-
-![Late training result](figures/epoch_0199.png)
-
-At the late stage of training, the rendered result is noticeably improved. The overall geometry is more coherent, the object boundary is clearer, and the appearance is closer to the target view. Although the simplified implementation is still limited in detail recovery, it can reconstruct the main visual structure of the scene successfully.
+The model is optimized using image reconstruction loss between rendered images and ground-truth views.
 
 ---
 
-### 3.3 Final Multi-view Rendering
+### 4. Running
 
-In addition to the debug images, a multi-view rendering video was generated after training to inspect the reconstructed scene from different viewpoints.
+To train the simplified 3DGS model:
 
-**Supplementary result:** [Final multi-view rendering video](figures/render_mv.mp4)
+```bash
+python train.py --colmap_dir data/chair --checkpoint_dir data/chair/checkpoints
+```
 
-The video shows that the learned Gaussian representation can produce visually reasonable renderings from multiple viewpoints. The overall shape of the chair remains stable under viewpoint changes, which indicates that the simplified 3DGS model captures the main 3D structure of the scene rather than merely memorizing individual training images.
+To render a multi-view video after training:
 
----
-
-## 4. Task 3: Comparison with the Official 3DGS Implementation
-
-To further evaluate the simplified implementation, we compared it with the official 3DGS framework on the same scene. Since the assignment mainly requires qualitative comparison in terms of rendering quality, the discussion here focuses on the visual results.
-
-### 4.1 Official 3DGS Results
-
-The following figures show representative renderings produced by the official implementation.
-
-![Official 3DGS result 1](figures/00041.png)
-
-![Official 3DGS result 2](figures/00062.png)
-
-![Official 3DGS result 3](figures/00099.png)
-
-From these examples, the official implementation produces cleaner object boundaries, more accurate color reconstruction, and sharper local details. The chair structure is more stable and visually more realistic.
+```bash
+python render_3dgs_mv.py --colmap_dir data/chair --checkpoint data/chair/checkpoints/checkpoint_000060.pt --num_frames 240 --fps 30
+```
 
 ---
 
-### 4.2 Qualitative Comparison
+### 5. Results
 
-Compared with the official 3DGS, our simplified implementation is able to reconstruct the global structure of the chair and produce meaningful novel-view renderings, which demonstrates that the essential Gaussian rendering mechanism is correctly implemented.
+#### 5.1 Training Process
 
-However, the simplified implementation still shows several limitations:
+<img src="figures/epoch_0000.png" alt="Task 2 Early Training Result" width="700">
 
-* The rendered images are blurrier than those from the official implementation.
-* Fine details and local textures are less sharp.
-* Object boundaries are not as clean or stable as those from the official framework.
+At the beginning of training, the rendered result is still very rough. The main chair structure is only vaguely visible, and the image is blurry with limited geometric consistency.
 
-These differences are reasonable because the simplified implementation only preserves the core rendering logic, while the official 3DGS includes more advanced engineering optimizations and a more complete training pipeline.
+<img src="figures/epoch_0100.png" alt="Task 2 Middle Training Result" width="700">
 
-Overall, the simplified implementation successfully demonstrates the main idea of 3D Gaussian Splatting, while the official implementation achieves clearly better rendering quality.
+In the middle stage of training, the chair structure becomes much clearer. Major color regions and boundaries begin to emerge, and the rendering quality improves steadily.
+
+<img src="figures/epoch_0199.png" alt="Task 2 Final Training Result" width="700">
+
+At the final stage, the rendered image becomes much more stable and visually meaningful. The global chair structure is clearly reconstructed, and the overall appearance is significantly closer to the target views.
+
+#### 5.2 Final Multi-view Rendering
+
+[Click here to view the Task 2 multi-view rendering video](figures/render_mv.mp4)
+
+Since GitHub Markdown does not always display video files directly in the page, the final rendered video is provided as a clickable link above.
+
+The final multi-view rendering video shows that the simplified model is able to generate coherent novel-view renderings from different viewpoints. This indicates that the learned Gaussians capture the main 3D structure of the scene rather than only memorizing single training images.
 
 ---
 
-## 5. Conclusion
+### 6. Discussion
 
-In this assignment, we completed a simplified 3D Gaussian Splatting pipeline in PyTorch and verified that it can reconstruct a 3D scene from multi-view images. Starting from sparse COLMAP points, the model was able to learn Gaussian parameters and render reasonable scene appearances from different viewpoints.
+Task 2 demonstrates that even a simplified PyTorch implementation can recover the major geometric structure and appearance of the scene. The training process clearly shows the gradual improvement of rendering quality from early iterations to the final stage.
 
-The training results show that the simplified implementation gradually improves during optimization and finally captures the main geometry and appearance of the chair scene. The comparison with the official 3DGS further shows that, although our implementation is simpler and less accurate in details, it still reproduces the central idea of Gaussian-based differentiable rendering.
+At the same time, the simplified implementation still has visible limitations. The rendered results remain blurrier than those of a fully optimized system, and fine details are less sharp. This is expected because the implementation is focused on the core rendering pipeline rather than engineering efficiency or advanced optimization strategies.
 
-In summary, this assignment helped us understand the full workflow of 3D Gaussian Splatting, including Gaussian parameterization, projection, alpha blending, and the difference between a simplified educational implementation and a fully optimized official system.
+---
+
+## Task 3: Comparison with the Official 3DGS Implementation
+
+### 1. Task Description
+
+In this task, I compared my simplified 3DGS implementation with the **official 3D Gaussian Splatting implementation** on the same scene.
+
+The comparison in this report is mainly qualitative, focusing on the visual rendering quality of the two methods.
+
+---
+
+### 2. Input and Output
+
+**Input**
+
+* The same `chair` scene used in Task 2
+
+**Output**
+
+* Representative rendered images from the official 3DGS implementation
+* Qualitative comparison between the simplified implementation and the official implementation
+
+---
+
+### 3. Running the Official Implementation
+
+The official 3DGS implementation was run on the same dataset after environment setup and training. Since the official run in this report was performed without evaluation mode, the comparison here focuses on the representative rendered outputs rather than quantitative evaluation metrics.
+
+---
+
+### 4. Results
+
+<img src="figures/00041.png" alt="Official 3DGS Result 1" width="700">
+
+<img src="figures/00062.png" alt="Official 3DGS Result 2" width="700">
+
+<img src="figures/00099.png" alt="Official 3DGS Result 3" width="700">
+
+The official implementation produces cleaner boundaries, more accurate color reconstruction, and sharper local details. The object structure is visually more stable and realistic than that of the simplified implementation.
+
+---
+
+### 5. Discussion
+
+Compared with the official 3DGS framework, my simplified implementation is able to reconstruct the main global structure of the chair and generate meaningful rendered views. This shows that the essential Gaussian rendering logic has been successfully implemented.
+
+However, the official implementation achieves clearly better rendering quality. The rendered images are sharper, more detailed, and more visually consistent. This difference is reasonable because the official implementation includes a much more complete and optimized training and rendering pipeline, while the simplified version is mainly designed for educational understanding of the core algorithm.
+
+Overall, the qualitative comparison confirms that the simplified implementation captures the key idea of 3D Gaussian Splatting, while the official implementation provides substantially better rendering fidelity.
+
+---
+
+## Conclusion
+
+In this assignment, I completed a simplified 3D Gaussian Splatting pipeline in PyTorch and compared it with the official 3DGS implementation.
+
+Task 1 showed how COLMAP can recover sparse geometry and camera parameters from multi-view images. Task 2 demonstrated how these sparse points can be converted into Gaussian primitives and optimized through differentiable rendering. Task 3 further showed that, although the simplified implementation can recover the main structure and appearance of the scene, the official implementation produces significantly better visual results.
+
+Overall, this assignment helped me understand the full workflow of 3D Gaussian Splatting, from sparse reconstruction and Gaussian initialization to differentiable rendering and qualitative comparison with a mature official system.
+
+---
+
+## Acknowledgement
+
+This work was completed with reference to the following materials:
+
+* 3D Gaussian Splatting for Real-Time Radiance Field Rendering
+* Official 3D Gaussian Splatting Repository
+* COLMAP Documentation
+* PyTorch Documentation
+
+In particular:
+
+* **Task 1** was completed with the help of the COLMAP reconstruction pipeline.
+* **Task 2** was implemented in pure PyTorch based on the simplified educational framework provided in the assignment.
+* **Task 3** was completed by running the official 3DGS implementation and qualitatively comparing its rendering results with my own implementation.
